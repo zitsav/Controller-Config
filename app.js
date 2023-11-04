@@ -1,29 +1,31 @@
-const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const keypress = require('keypress');
 const cors = require('cors');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIO(server);
+const httpServer = http.createServer();
+const io = socketIO(httpServer, { cors: { origin: '*' } });
 
-// Enable CORS for Socket.I
+httpServer.listen(2550, () => console.log('Server is running on port 2550'));
 
-app.use(cors()); // Enable CORS for Express app
+io.on('connection', handleUserConnection);
 
-// io.origins('*:*');
-
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
-
-io.on('connection', (socket) => {
+function handleUserConnection(socket) {
   console.log('A user connected');
 
-  keypress(process.stdin);
+  setupKeypressListener();
 
-  process.stdin.on('keypress', (ch, key) => {
+  socket.on('disconnect', () => console.log('User disconnected'));
+
+  function setupKeypressListener() {
+    keypress(process.stdin);
+    process.stdin.on('keypress', handleKeypress);
+
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+  }
+
+  function handleKeypress(ch, key) {
     if (key) {
       const pressedKey = key.name;
       console.log('Received key press from console:', pressedKey);
@@ -34,18 +36,5 @@ io.on('connection', (socket) => {
         console.log('Invalid key input from console:', pressedKey);
       }
     }
-  });
-
-  process.stdin.setRawMode(true);
-  process.stdin.resume();
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
-
-const PORT = process.env.PORT || 2550;
-
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+  }
+}
