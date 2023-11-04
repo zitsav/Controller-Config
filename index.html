@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Client</title>
+</head>
+<body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io('https://a46f-2409-40e3-1018-f665-ad66-3153-5942-4214.ngrok-free.app/'); // Replace with your server address
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('keyPress', (pressedKey) => {
+            console.log('Received key press from server:', pressedKey);
+
+            // Add your logic to handle key presses in the browser
+            // For example, update the UI or perform other actions
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+    </script>
+
+</body>
+</html>
